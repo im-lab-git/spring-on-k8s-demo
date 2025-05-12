@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    environment {
+        GCP_PROJECT = 'your-gcp-project-id'
+        GCR_REGISTRY = 'gcr.io'
+        APP_NAME = 'spring-on-k8s'
+        CLUSTER_NAME = 'your-gke-cluster'
+        CLUSTER_ZONE = 'your-cluster-zone'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build and Test') {
+            steps {
+                sh './mvnw clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${GCR_REGISTRY}/${GCP_PROJECT}/${APP_NAME}:${env.BUILD_ID}")
+                }
+            }
+        }
+
+        stage('Push to GCR') {
+            steps {
+                script {
+                    docker.withRegistry("https://${GCR_REGISTRY}", 'gcr-auth') {
+                        docker.image("${GCR_REGISTRY}/${GCP_PROJECT}/${APP_NAME}:${env.BUILD_ID}").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to GKE') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'gke-kubeconfig', variable: 'KUBECONFIG')]) {
+                        // Update deployment with new image tag
+                        sh "sed -i 's|spring-on-k8s:latest|${GCR_REGISTRY}/${GCP_PROJECT}/${APP_NAME}:${env.BUILD_ID}|g' k8s/deployment.yml"
+                        
+                        sh """
+                            kubectl apply -f k8s/namespace.yml
+                            kubectl apply -f k8s/cm.yml
+                            kubectl apply -f k8s/service.yml
+                            kubectl apply -f k8s/deployment.yml
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
