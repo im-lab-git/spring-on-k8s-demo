@@ -2,6 +2,8 @@ pipeline {
     agent any
     environment {
         GCP_PROJECT     = 'your-gcp-project-id'
+        DOCKER_IMAGE = "devsecopslb/spring-on-k8s-demo"
+        DOCKER_TAG = "latest"
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_USERNAME = 'ingmdevsecops'
         DOCKER_CREDS    = 'dockerhub-creds'
@@ -51,7 +53,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME}:${env.BUILD_ID}")
+                    def app = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
                 }
             }
         }
