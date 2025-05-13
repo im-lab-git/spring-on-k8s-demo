@@ -9,8 +9,6 @@ pipeline {
         CLUSTER_NAME    = 'gke-cluster'
         CLUSTER_ZONE    = 'asia-east1-c'
         PRISMA_API_URL  = 'https://api.sg.prismacloud.io'
-        PC_USER         = credentials('PC_USER')
-        PC_PASSWORD     = credentials('PC_PASSWORD')
     }
     options {
         preserveStashes()
