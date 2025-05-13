@@ -1,16 +1,16 @@
 pipeline {
     agent any
     environment {
-        GCP_PROJECT = env.GCP_PROJECT ?: 'your-gcp-project-id'
-        DOCKER_REGISTRY = env.DOCKER_REGISTRY ?: 'docker.io'
-        DOCKER_USERNAME = env.DOCKER_USERNAME ?: 'ingmdevsecops'
-        DOCKER_CREDS = env.DOCKER_CREDS ?: 'dockerhub-creds'
-        APP_NAME = 'spring-on-k8s'
-        CLUSTER_NAME = env.CLUSTER_NAME ?: 'gke-cluster'
-        CLUSTER_ZONE = env.CLUSTER_ZONE ?: 'asia-east1-c'
-        PRISMA_API_URL="https://api.sg.prismacloud.io"
-        PC_USER = env.PC_USER
-        PC_PASSWORD = env.PC_PASSWORD
+        GCP_PROJECT     = 'your-gcp-project-id'
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_USERNAME = 'ingmdevsecops'
+        DOCKER_CREDS    = 'dockerhub-creds'
+        APP_NAME        = 'spring-on-k8s'
+        CLUSTER_NAME    = 'gke-cluster'
+        CLUSTER_ZONE    = 'asia-east1-c'
+        PRISMA_API_URL  = 'https://api.sg.prismacloud.io'
+        PC_USER         = credentials('PC_USER')
+        PC_PASSWORD     = credentials('PC_PASSWORD')
     }
     options {
         preserveStashes()
